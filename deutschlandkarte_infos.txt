@@ -1,0 +1,10 @@
+Quelle: https://commons.wikimedia.org/wiki/File:Relief_Map_of_Germany.png
+
+English: Relief map of Germany
+
+Equirectangular projection, N/S stretching 150 %. Geographic limits of the map:
+
+    N: 55.1° N
+    S: 47.2° N
+    W: 5.5° E
+    E: 15.5° E
