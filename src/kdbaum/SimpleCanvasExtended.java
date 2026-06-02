@@ -29,6 +29,52 @@ import java.io.IOException;
  *    Neuzeichnen nach Fenster-Resize.
  */
 public class SimpleCanvasExtended {
+	
+	// -------------------------------------------------------
+	// innere Klassen für die extended Version
+	// -------------------------------------------------------
+	public static class Rect {
+        public double x, y, width, height;
+
+        public Rect(double x, double y, double width, double height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+        
+        public Rect(Point a, Point b) {
+        	this.x = Math.min(a.x,b.x);
+        	this.y = Math.min(a.y, b.y);
+        	this.width = Math.abs(a.x-b.x);
+        	this.height = Math.abs(a.y-b.y);
+        }
+        
+        public Point pointToRelative(Point p) {
+        	return new Point((p.x-this.x)/this.width, (p.y-this.y)/this.height);
+        }
+        
+        public Point relativeToPoint(Point rel) {
+        	return new Point(this.x+rel.x*this.width, this.y+rel.y*this.height);
+        }
+        
+        public Point scaleFrom(Rect fromRect, Point fromPoint) {
+        	return this.relativeToPoint(fromRect.pointToRelative(fromPoint));        	
+        }
+    }
+	
+	public static class Point {
+		public double x, y;
+		
+		public Point(double x, double y) {
+			this.x = x; 
+			this.y = y;
+		}
+		
+		public double dist(Point p) {
+			return Math.sqrt((this.x-p.x)*(this.x-p.x)+(this.y-p.y)*(this.y-p.y));
+		}
+	}
 
     // -------------------------------------------------------
     // BEOBACHTER-MUSTER: Das Listener-Interface
@@ -202,5 +248,44 @@ public class SimpleCanvasExtended {
 
     private void refresh() {
         SwingUtilities.invokeLater(panel::repaint);
+    }
+    
+    // ----------------------------------------------------
+    // Methoden für Extended überarbeitet
+    // ----------------------------------------------------
+    /**
+     * Letzte Zeichenaktion rückgängig
+     */
+    public void undoLast() {
+    	panel.commands.removeLast();
+    	refresh();
+    }
+    
+    /**
+     * Zeichnet einen Punkt 
+     */
+    public void drawPoint(Point a, Color color) {
+    	drawPoint(a.x, a.y, color);
+    }
+    
+    /**
+     * Zeichnet eine Linie von (x1, y1) nach (x2, y2).
+     */
+    public void drawLine(Point a, Point b, Color color) {
+    	drawLine(a.x,a.y,b.x,b.y,color);
+    }
+
+    /**
+     * Beschriftet eine Position mit einem Text.
+     */
+    public void drawLabel(Point p, String text, Color color) {
+    	drawLabel(p.x, p.y, text, color);
+    }
+
+    /**
+     * Zeichnet ein Rechteck (z.B. für KD-Baum-Regionen).
+     */
+    public void drawRect(Rect r, Color color) {
+    	drawRect(r.x, r.y, r.width, r.height, color);
     }
 }
