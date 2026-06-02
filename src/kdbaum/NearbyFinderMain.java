@@ -87,6 +87,7 @@ public class NearbyFinderMain {
         System.out.println();
 
         KDTree kdTree = new KDTree();
+        kdTree.canvas.setBackgroundImage("deutschlandkarte.png");
         for (Location loc : staedte) {
             kdTree.insert(loc);
         }

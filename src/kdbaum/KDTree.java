@@ -27,6 +27,9 @@ public class KDTree {
 
     /** Wurzel des k-d Trees. Zu Beginn null (leerer Baum). */
     private KDNode root;
+    
+    // Canvas
+    public static final SimpleCanvasExtended canvas = new SimpleCanvasExtended(800, 600, "k-d-tree");
 
     /**
      * Erstellt einen leeren k-d Tree.
@@ -66,17 +69,22 @@ public class KDTree {
         //
         //  Hinweise:
         //  - Ist node == null, erzeuge einen neuen KDNode(loc, depth) und gib ihn zurück.
+    	if (node == null) return new KDNode(loc, depth);
         //
         //  - Bestimme den Achsenwert des neuen Ortes:
-        //      double newVal = (depth % 2 == 0) ? loc.lon : loc.lat;
+        double newVal = (depth % 2 == 0) ? loc.lon : loc.lat;
         //
         //  - Bestimme den Achsenwert des aktuellen Knotens:
-        //      double nodeVal = node.getAxisValue();
+        double nodeVal = node.getAxisValue();
         //
         //  - Vergleiche newVal mit nodeVal:
         //      * newVal < nodeVal  → rekursiv links  weiter (depth + 1)
         //      * newVal >= nodeVal → rekursiv rechts weiter (depth + 1)
-        //
+        if (newVal < nodeVal) {
+        	node.left = insertRec(node.left, loc, depth+1);
+        } else {
+        	node.right = insertRec(node.right, loc, depth+1);
+        }
         //  - Gib am Ende immer node zurück.
 
         return node; // Platzhalter – bitte ersetzen
@@ -122,28 +130,40 @@ public class KDTree {
         //
         //  Schritt 1 – Abbruch
         //      Ist node == null → return (nichts zu tun).
+    	if (node == null) return;
         //
         //  Schritt 2 – Aktuellen Knoten prüfen
         //      Berechne den Abstand von node.location zum Anfragepunkt:
-        //          double dist = node.location.distanceTo(queryLat, queryLon);
-        //      Ist dist < bestDist[0]:
-        //          best[0]    = node;
-        //          bestDist[0] = dist;
+        double dist = node.location.distanceTo(queryLat, queryLon);
+        if (dist < bestDist[0]) {
+                  best[0]    = node;
+                  bestDist[0] = dist;
+        }
         //
         //  Schritt 3 – Teilbäume durchsuchen
         //      a) Bestimme den Achsenwert des Anfragepunkts:
-        //             double queryVal = (node.depth % 2 == 0) ? queryLon : queryLat;
+        double queryVal = (node.depth % 2 == 0) ? queryLon : queryLat;
         //         Vergleiche queryVal mit node.getAxisValue():
         //             queryVal < nodeVal  → zuerst linken  Teilbaum besuchen
         //             queryVal >= nodeVal → zuerst rechten Teilbaum besuchen
         //         (Den anderen Teilbaum nennen wir "other".)
         //
         //      b) Rekursiv den "näheren" Teilbaum durchsuchen (immer).
+        KDNode other;
+        if (queryVal < node.getAxisValue()) {
+        	nearestRec(node.left, queryLat, queryLon, best, bestDist);
+        	other = node.right;
+        } else {
+        	nearestRec(node.right, queryLat, queryLon, best, bestDist);
+        	other = node.left;
+        }
         //
         //      c) Pruning für den anderen Teilbaum:
-        //             double axisDistance = Math.abs(queryVal - node.getAxisValue());
-        //         Ist axisDistance < bestDist[0]:
+        double axisDistance = Math.abs(queryVal - node.getAxisValue());
+        if (axisDistance < bestDist[0]) {
         //             → anderen Teilbaum ebenfalls durchsuchen
+        	nearestRec(other, queryLat, queryLon, best, bestDist);
+        }
         //         Sonst:
         //             → anderen Teilbaum überspringen (Pruning!)
     }
@@ -187,11 +207,14 @@ public class KDTree {
         //
         //  Hinweise:
         //  - Abbruchbedingung: node == null → return.
+    	if (node == null) return;
         //
         //  - Prüfe, ob node.location im Bereich liegt (beide Dimensionen!):
-        //      node.location.lat >= latMin && node.location.lat <= latMax
-        //      node.location.lon >= lonMin && node.location.lon <= lonMax
+        if (node.location.lat >= latMin && node.location.lat <= latMax && 
+             node.location.lon >= lonMin && node.location.lon <= lonMax) {
         //    → Falls ja: node.location zur Ergebnisliste hinzufügen.
+        	result.add(node.location);
+        }
         //
         //  - Pruning abhängig von der Teilungsachse (node.depth % 2):
         //
@@ -199,11 +222,35 @@ public class KDTree {
         //      node.location.lon < lonMin → nur rechten  Teilbaum durchsuchen
         //      node.location.lon > lonMax → nur linken   Teilbaum durchsuchen
         //      Sonst                      → beide Teilbäume durchsuchen
-        //
-        //    Lat-Ebene (depth % 2 == 1):
-        //      node.location.lat < latMin → nur rechten  Teilbaum durchsuchen
-        //      node.location.lat > latMax → nur linken   Teilbaum durchsuchen
-        //      Sonst                      → beide Teilbäume durchsuchen
+        if (node.depth % 2 == 0) {
+	        if (node.location.lon < lonMin) {
+	        	//nur rechten Teilbaum
+	        	rangeSearchRec(node.right, latMin, latMax, lonMin, lonMax, result);
+	        } else if (node.location.lon > lonMax) {
+	        	//nur linken Teilbaum 
+	        	rangeSearchRec(node.left, latMin, latMax, lonMin, lonMax, result);
+	        } else {
+	        	//beide
+	        	rangeSearchRec(node.right, latMin, latMax, lonMin, lonMax, result);
+	        	rangeSearchRec(node.left, latMin, latMax, lonMin, lonMax, result);
+	        }
+        } else {
+            //    Lat-Ebene (depth % 2 == 1):
+            //      node.location.lat < latMin → nur rechten  Teilbaum durchsuchen
+            //      node.location.lat > latMax → nur linken   Teilbaum durchsuchen
+            //      Sonst                      → beide Teilbäume durchsuchen
+        	if (node.location.lat < latMin) {
+	        	//nur rechten Teilbaum
+	        	rangeSearchRec(node.right, latMin, latMax, lonMin, lonMax, result);
+	        } else if (node.location.lat > latMax) {
+	        	//nur linken Teilbaum 
+	        	rangeSearchRec(node.left, latMin, latMax, lonMin, lonMax, result);
+	        } else {
+	        	//beide
+	        	rangeSearchRec(node.right, latMin, latMax, lonMin, lonMax, result);
+	        	rangeSearchRec(node.left, latMin, latMax, lonMin, lonMax, result);
+	        }
+        }
     }
 
     // =========================================================================
