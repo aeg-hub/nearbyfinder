@@ -61,6 +61,10 @@ public class SimpleCanvasExtended {
         public Point scaleFrom(Rect fromRect, Point fromPoint) {
         	return this.relativeToPoint(fromRect.pointToRelative(fromPoint));        	
         }
+
+		public Point mirrorY(Point pC) {
+			return new Point(pC.x, this.y+this.height-(pC.y-this.y));
+		}
     }
 	
 	public static class Point {

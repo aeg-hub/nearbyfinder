@@ -29,7 +29,7 @@ public class KDTree {
     private KDNode root;
     
     // Canvas
-    public static final SimpleCanvasExtended canvas = new SimpleCanvasExtended(800, 600, "k-d-tree");
+    public static final SimpleCanvasExtended canvas = new SimpleCanvasExtended(500, 592, "k-d-tree");
 
     /**
      * Erstellt einen leeren k-d Tree.
