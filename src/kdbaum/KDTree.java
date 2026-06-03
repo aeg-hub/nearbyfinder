@@ -1,7 +1,11 @@
 package kdbaum;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+
+import kdbaum.SimpleCanvasExtended.Point;
+import kdbaum.SimpleCanvasExtended.Rect;
 
 /**
  * =============================================================================
@@ -30,7 +34,16 @@ public class KDTree {
     
     // Canvas
     public static final SimpleCanvasExtended canvas = new SimpleCanvasExtended(500, 592, "k-d-tree");
+    private static Rect rCanvas = new Rect(0,0,500,592);
+    private static Rect rD = new Rect(5.5, 47.2, 15.5 - 5.5, 55.1-47.2  );
 
+    public static Point pointFromLocation(Location loc) {
+        Point p = new Point(loc.lon, loc.lat);
+        Point pC = rCanvas.scaleFrom(rD, p);
+        return rCanvas.mirrorY(pC);
+    }
+
+    
     /**
      * Erstellt einen leeren k-d Tree.
      */
@@ -275,4 +288,26 @@ public class KDTree {
     public boolean isEmpty() {
         return root == null;
     }
+
+
+	public void draw() {
+		// TODO Auto-generated method stub
+		this.drawRec(this.root, rCanvas);
+	}
+	
+	public void drawRec(KDNode n, Rect cur) {
+		if (n==null) return;
+		Point p = pointFromLocation(n.location);
+		System.out.println(n.location.name);
+		if (n.depth % 2==0) { // lon = x
+			canvas.drawLine(new Point(p.x,cur.y+cur.height), new Point(p.x,cur.y), Color.BLACK);
+			drawRec(n.left,new Rect(new Point(cur.x,cur.y), new Point(p.x,cur.y+cur.height) ));
+			drawRec(n.right,new Rect(new Point(p.x,cur.y), new Point(cur.x+cur.width,cur.y+cur.height) ));
+		} else { // lat = y
+			canvas.drawLine(new Point(cur.x+cur.width,p.y), new Point(cur.x,p.y), Color.BLACK);
+			// Hier zuerst right, wegen der Spiegelung an y-Achse
+			drawRec(n.right,new Rect(new Point(cur.x,cur.y), new Point(cur.x+cur.width,p.y) ));
+			drawRec(n.left,new Rect(new Point(cur.x,p.y), new Point(cur.x+cur.width,cur.y+cur.height) ));
+		}
+	}
 }
