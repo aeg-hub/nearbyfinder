@@ -93,6 +93,38 @@ git checkout loesung-vornamename   # wieder zurück zum eigenen Branch
 
 ---
 
+## Auf main weitergearbeitet aber neue Änderungen benötigt
+
+```bash
+# 1. Aktuellen Branch umbenennen
+# -m steht für "move/rename" – benennt den Branch lokal um,
+# ohne die Commit-Historie zu verändern
+git branch -m main feature
+
+# 2. Alle Branches und Änderungen vom Remote holen,
+# aber noch NICHT in den lokalen Branch einmergen (kein pull!)
+# "origin" ist der Standardname für das Remote-Repository (z.B. auf GitHub)
+# und wird beim "git clone" automatisch vergeben – es ist ein Alias für die
+# hinterlegte URL (einsehbar mit: git remote -v)
+git fetch origin
+
+# 3. Neuen lokalen Branch "main" erstellen, der direkt auf
+# origin/main zeigt (den gerade gefetchten Stand von GitHub)
+# -b steht für "branch" – erstellt den Branch und wechselt sofort rein
+# origin/main = der main-Branch so wie er auf dem Remote-Repository liegt
+git checkout -b main origin/main
+
+# 4. Zurück auf den feature-Branch wechseln
+git checkout feature
+
+# 5. Rebase: Nimmt deine Commits aus "feature" und setzt sie
+# auf die Spitze des aktuellen "main" neu auf –
+# so als hättest du sie erst NACH den neuen main-Commits gemacht
+git rebase main
+```
+
+---
+
 ## Typische Fehlermeldungen
 
 **„Please tell me who you are"**
