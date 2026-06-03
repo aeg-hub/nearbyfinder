@@ -20,14 +20,6 @@ import java.awt.Color;
  * =============================================================================
  */
 public class NearbyFinderMain {
-    private static Rect rCanvas = new Rect(0,0,500,592);
-    private static Rect rD = new Rect(5.5, 47.2, 15.5 - 5.5, 55.1-47.2  );
-
-    public static Point pointFromLocation(Location loc) {
-        Point p = new Point(loc.lon, loc.lat);
-        Point pC = rCanvas.scaleFrom(rD, p);
-        return rCanvas.mirrorY(pC);
-    }
 	
     public static void main(String[] args) {
 
@@ -103,13 +95,16 @@ public class NearbyFinderMain {
         kdTree.canvas.setBackgroundImage("deutschlandkarte.png");
         for (Location loc : staedte) {
             kdTree.insert(loc);
-            Point pC = pointFromLocation(loc);
+            Point pC = KDTree.pointFromLocation(loc);
             kdTree.canvas.drawPoint(pC, Color.BLUE);
             kdTree.canvas.drawLabel(pC, loc.name, Color.BLACK);
 
         }
         System.out.println("Anzahl eingefügter Orte: " + kdTree.size());
 
+        // Baum ausgeben
+        kdTree.draw();
+        
         // Aufgabe 2.2 – Nächster Nachbar
         System.out.println("\n-- Nächster Nachbar zu (51.5, 7.5) --");
         System.out.println("   (Anfragepunkt liegt zwischen Köln, Düsseldorf und Dortmund)");
