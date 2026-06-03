@@ -271,7 +271,7 @@ public class SimpleCanvasExtended {
      * Letzte Zeichenaktion rückgängig
      */
     public void undoLast() {
-    	panel.commands.removeLast();
+    	//panel.commands.removeLast();
     	refresh();
     }
     
