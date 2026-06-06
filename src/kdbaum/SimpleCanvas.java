@@ -1,6 +1,7 @@
 package kdbaum;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -81,7 +82,17 @@ public class SimpleCanvas {
             }
         }
 
-        void addCommand(DrawCommand cmd) { commands.add(cmd); }
+        void addCommand(DrawCommand cmd) {
+            // EDT = Event Dispatch Thread: Swing's einziger Thread, der die
+            // Benutzeroberfläche zeichnet und Ereignisse (Klicks, Tastatur etc.)
+            // verarbeitet. Alle Änderungen an UI-Elementen müssen auf diesem
+            // Thread stattfinden – sonst drohen Fehler wie ConcurrentModificationException.
+            // invokeLater() stellt sicher, dass der Code auf dem EDT ausgeführt wird.
+            SwingUtilities.invokeLater(() -> {
+                commands.add(cmd);
+                // repaint(); // wird vermutlich auch an anderer STelle aufgerufen
+            });
+        }
         void clearCommands() { commands.clear(); }
         void setBackgroundImage(BufferedImage img) { backgroundImage = img; }
     }
