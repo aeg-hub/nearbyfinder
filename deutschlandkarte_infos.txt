@@ -1,9 +1,13 @@
 Quelle: https://commons.wikimedia.org/wiki/File:Relief_Map_of_Germany.png
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> f39e4ea (Klassen implementiert die zu KDTree gehören)
+=======
+
+>>>>>>> 40036f2aef4ba40aab214980ac11bf7131b29e84
 geometry 500 x 592 Pixel
 
 English: Relief map of Germany
